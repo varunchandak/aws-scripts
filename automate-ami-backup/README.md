@@ -30,4 +30,4 @@ Notes:
 * It is **highly recommended** to test before using this script.
 * I am not responsible for any damage caused by this. (Given that there is no `rm -rf *` command in it.)
 ___
-### Any optimization in the script is welcome. This script is uploaded on Github.
+### Any optimization in the script is welcome.
