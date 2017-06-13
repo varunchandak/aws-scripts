@@ -332,6 +332,13 @@ testexample.com,MX,10 testexample2.com
 ![](http://cloudbeings.in/images/r53-gui-output.png)
 
 
-
 Code is available on [Github](github.com)
+
+---
+
+## NOTES:
+
+1.  I am not responsible for any command not working, it’s working for me as intended.
+2.  Suggestions/Edits are welcome.
+3.  Use of `Python` and `jq` are incorporated, make sure they are installed and configured properly.
 
