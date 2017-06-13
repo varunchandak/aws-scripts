@@ -1,13 +1,3 @@
-<pre>
-<div align=center valign=middle>
-#################################################
-Author: Varun Chandak (varun@cloudcover.in)
-Creation Date - 13 June 2017
-Latest Edit - N/A
-#################################################
-</div>
-</pre>
-
 # Automate Route53 entries using Shell Script
 ---
 
@@ -333,12 +323,13 @@ testexample.com,MX,10 testexample2.com
 ---
 
 ### Screenshots
+#### Terminal Output
 
-SCREEN 1
+![](http://cloudbeings.in/images/r53-terminal-output.png)
 
+#### AWS Console Output
 
-
-SCREEN 2
+![](http://cloudbeings.in/images/r53-gui-output.png)
 
 
 
