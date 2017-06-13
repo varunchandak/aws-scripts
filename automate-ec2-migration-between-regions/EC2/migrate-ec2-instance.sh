@@ -68,7 +68,7 @@ SG_ARRAY=($(aws ec2 describe-instances \
  --region "$SOURCE_REGION" \
  --instance-ids "$SOURCE_INST_ID" \
  --query 'Reservations[*].Instances[*].SecurityGroups[*].GroupId' | tr -s '\t' ' '))
-export AWS_DEFAULT_PROFILE=abmcpl
+export AWS_DEFAULT_PROFILE="TESTPROFILE"
 for SG_ID in "${SG_ARRAY[@]}"; do
  export AWS_DEFAULT_REGION="$SOURCE_REGION"
  /usr/bin/python \
