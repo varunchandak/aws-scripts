@@ -1,0 +1,6 @@
+testexample.com,A,1.2.3.4
+qa.testexample.com,A,4.3.2.1
+ftp.testexample.com,CNAME,testexample.com
+www.testexample.com,CNAME,testexample.com
+testexample.com,MX,5 testexample1.com
+testexample.com,MX,10 testexample2.com
