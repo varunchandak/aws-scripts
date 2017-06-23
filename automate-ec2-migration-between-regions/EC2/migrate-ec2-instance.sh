@@ -1,7 +1,7 @@
 #!/bin/bash
 ##################################################################################################################
 export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'
-alias aws=''`which aws`' --profile abmcpl --output text'
+alias aws=''`which aws`' --profile <TEST> --output text'
 shopt -s expand_aliases
 ##################################################################################################################
 # Script Logic for migrating single EC2 instance
