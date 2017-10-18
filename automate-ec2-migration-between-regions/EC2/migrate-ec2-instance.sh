@@ -3,50 +3,32 @@
 export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'
 alias aws=''`which aws`' --profile <TEST> --output text'
 shopt -s expand_aliases
-##################################################################################################################
+
 # Script Logic for migrating single EC2 instance
 SOURCE_INST_ID="$1" # i-source
 SOURCE_REGION="$2" # ap-southeast-1
 TARGET_REGION="$3" # ap-south-1
-##################################################################################################################
+
 #Migration of EC2 instance from another region
-##################
 #Assumptions:
 #1. Same CIDR VPC present in <TARGET REGION>
-##################
+
 #Steps:
 #1. Create image of <SOURCE EC2 INSTANCE>
-DEST_INST_NAME="$(aws ec2 describe-instances \
- --region "$SOURCE_REGION" \
- --instance-ids "$SOURCE_INST_ID" \
- --query 'Reservations[*].Instances[*].Tags[?Key==`Name`].Value')"
+DEST_INST_NAME="$(aws ec2 describe-instances --region "$SOURCE_REGION" --instance-ids "$SOURCE_INST_ID" --query 'Reservations[*].Instances[*].Tags[?Key==`Name`].Value')"
 
-SOURCE_IMAGE="$(aws ec2 create-image \
- --region "$SOURCE_REGION" \
- --instance-id "$SOURCE_INST_ID" \
- --name "$DEST_INST_NAME"_"$(date +%d%b%Y)" \
- --description "$DEST_INST_NAME"_"$(date +%d%b%Y)" \
- --no-reboot)"
-##################################################################################################################
+SOURCE_IMAGE="$(aws ec2 create-image --region "$SOURCE_REGION" --instance-id "$SOURCE_INST_ID" --name "$DEST_INST_NAME"_"$(date +%d%b%Y)" --description "$DEST_INST_NAME"_"$(date +%d%b%Y)" --no-reboot)"
+
 #2. Copy image to <TARGET REGION>
 while true; do
- AMI_STATE="$(aws ec2 describe-images \
-  --region "$SOURCE_REGION" \
-  --filters Name=image-id,Values="$SOURCE_IMAGE" \
-  --query 'Images[*].State')"
+ AMI_STATE="$(aws ec2 describe-images --region "$SOURCE_REGION" --filters Name=image-id,Values="$SOURCE_IMAGE" --query 'Images[*].State')"
  if [ "$AMI_STATE" == "available" ]; then
-  DEST_IMAGE="$(aws ec2 copy-image \
-   --region "$TARGET_REGION" \
-   --source-region "$SOURCE_REGION" \
-   --source-image-id "$SOURCE_IMAGE" \
-   --name "$DEST_INST_NAME - Copied from $SOURCE_REGION" \
-   --description "$DEST_INST_NAME - Copied from $SOURCE_REGION")"
+  DEST_IMAGE="$(aws ec2 copy-image --region "$TARGET_REGION" --source-region "$SOURCE_REGION" --source-image-id "$SOURCE_IMAGE" --name "$DEST_INST_NAME - Copied from $SOURCE_REGION" --description "$DEST_INST_NAME - Copied from $SOURCE_REGION")"
   break
  fi
- echo sleeping
- sleep 30
+ echo sleeping; sleep 15
 done
-##################################################################################################################
+
 #3. Copy Security Groups to <TARGET REGION>
 #	Migration Steps Example:
 #	1. Setup your AWS profile to point to your source VPC
@@ -61,35 +43,52 @@ done
 #	   ./sg-335f31e5.sh
 #	6. Review newly created security group in target VPC
 #	   aws ec2 describe-security-groups --query 'SecurityGroups[*].[VpcId, GroupId, GroupName]' --output text
-TARGET_VPC_ID="$(aws ec2 describe-vpcs \
- --region "$TARGET_REGION" \
- --query 'Vpcs[*].VpcId')"
-SG_ARRAY=($(aws ec2 describe-instances \
- --region "$SOURCE_REGION" \
- --instance-ids "$SOURCE_INST_ID" \
- --query 'Reservations[*].Instances[*].SecurityGroups[*].GroupId' | tr -s '\t' ' '))
-export AWS_DEFAULT_PROFILE="TESTPROFILE"
+TARGET_VPC_ID="$(aws ec2 describe-vpcs --region "$TARGET_REGION" --query 'Vpcs[*].VpcId')"
+SG_ARRAY=($(aws ec2 describe-instances --region "$SOURCE_REGION" --instance-ids "$SOURCE_INST_ID" --query 'Reservations[*].Instances[*].SecurityGroups[*].GroupId' | tr -s '\t' ' '))
+export AWS_DEFAULT_PROFILE=abmcpl
 for SG_ID in "${SG_ARRAY[@]}"; do
  export AWS_DEFAULT_REGION="$SOURCE_REGION"
- /usr/bin/python \
- ../security_groups/copysg.py \
-  --shell --vpc="$TARGET_VPC_ID" "$SG_ID" > "$SG_ID".sh
+ /usr/bin/python copysg.py --shell --vpc="$TARGET_VPC_ID" "$SG_ID" > "$SG_ID".sh
  export AWS_DEFAULT_REGION="$TARGET_REGION"
  /bin/bash "$SG_ID".sh
  rm -fv "$SG_ID".sh
 done
 unset AWS_DEFAULT_PROFILE
 unset AWS_DEFAULT_REGION
-##################################################################################################################
+
 #4. Generate JSON of <SOURCE EC2 INSTANCE>
 #extract JSONs of existing instances
-aws ec2 describe-instances \
- --region "$SOURCE_REGION" \
- --instance-ids "$SOURCE_INST_ID" \
- --output json > "$SOURCE_INST_ID".json
-##################################################################################################################
-#5. Generate and Launch Instance with JSON
+aws ec2 describe-instances --region "$SOURCE_REGION" --instance-ids "$SOURCE_INST_ID" --output json > "$SOURCE_INST_ID".json
 
+#5. Modify JSON with <TARGET EC2 INSTANCE> details
+cat "$SOURCE_INST_ID".json | jq '.Reservations[].Instances[] | { DryRun, ImageId, KeyName, SecurityGroups, InstanceType, SubnetId, DisableApiTermination, PrivateIpAddress, EbsOptimized }' | sed 's/null/true/g' > migration-"$SOURCE_INST_ID".json
+
+#json for tagging
+cat "$SOURCE_INST_ID".json | jq '.Reservations[].Instances[] | { DryRun, Resources, Tags }' | sed '/DryRun/ s/null/true/g' > tags-"$SOURCE_INST_ID".json
+##################################################################################################################
+#change subnets
+aws ec2 describe-subnets --region $SOURCE_REGION --query 'Subnets[*].CidrBlock' | tr -s '\t' '\n' | sort | while read CIDR_BLOCK; do
+ paste -d, \
+ <(aws --region "$SOURCE_REGION" ec2 describe-subnets --filters Name=cidr-block,Values="$CIDR_BLOCK" --query 'Subnets[*].SubnetId') \
+ <(aws --region "$TARGET_REGION" ec2 describe-subnets --filters Name=cidr-block,Values="$CIDR_BLOCK" --query 'Subnets[*].SubnetId')
+done | sort -t, -k1 > oldnew_subnets.csv
+IFS=','
+while read -r OLDSUBNET NEWSUBNET; do
+ sed -i 's/'"$OLDSUBNET"'/'"$NEWSUBNET"'/g' migration-"$SOURCE_INST_ID".json
+done < oldnew_subnets.csv
+##################################################################################################################
+#change security groups
+join -t, \
+ <(aws ec2 describe-security-groups --region "$SOURCE_REGION" --output text --query 'SecurityGroups[*].[GroupName, GroupId]' | tr -s '\t' '\n' | paste -d, - - | sort -t, -k1) \
+ <(aws ec2 describe-security-groups --region "$TARGET_REGION" --output text --query 'SecurityGroups[*].[GroupName, GroupId]' | tr -s '\t' '\n' | paste -d, - - | sort -t, -k1) > /tmp/sgs.csv
+SOURCE_SG=$(jq '.Reservations[].Instances[].SecurityGroups[].GroupId' "$SOURCE_INST_ID".json | tr -d \")
+sed -i '/'"$SOURCE_SG"'/!d' /tmp/sgs.csv
+IFS=','
+while read -r SGNAME OLDSG NEWSG; do
+ sed -i 's/'"$OLDSG"'/'"$NEWSG"'/g' migration-"$SOURCE_INST_ID".json
+done < /tmp/sgs.csv
+
+#6. Generate and Launch Instance with JSON
 unset TARGETSG_ID
 while read line; do
  COUNTER=0
@@ -114,12 +113,12 @@ DEST_INST_ID="$(aws --region "$TARGET_REGION" ec2 run-instances \
  --count 1 \
  --associate-public-ip-address \
  --query 'Instances[*].InstanceId')"
-##################################################################################################################
+
 #7. Allocate EIP and assign the newly launched instance
 ALLOC_ID="$(aws --region "$TARGET_REGION" ec2 allocate-address --domain vpc --query 'AllocationId')"
 aws --region "$TARGET_REGION" ec2 associate-address --instance-id "$DEST_INST_ID" --allocation-id "$ALLOC_ID"
-##################################################################################################################
+
 #8. assign tags
 TAG_LIST="$(jq -c '.Reservations[].Instances[].Tags[]' "$SOURCE_INST_ID".json | while read line; do echo "$line" | tr -d \" | tr -d \{ | tr -d \} | tr -s ':' '=' | awk -F, '{print $2","$1}'; done | sed -e "/\s/ s/Value=/Value='/g" -e "/\s/ s/$/'/g" | tr -s '\n' ' ' | sed -e 's/\s$//')"
 
-aws --region "$TARGET_REGION" ec2 create-tags --resources "$DEST_INST_ID" --tags $TAG_LIST
+aws --region "$TARGET_REGION" ec2 create-tags --resources "$DEST_INST_ID" --tags "$TAG_LIST"
