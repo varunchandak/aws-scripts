@@ -52,11 +52,11 @@
 
 ## Scripts Description
 * `auto-install-custom-metrics-linux.sh`
-  This script contains automated process to install `custom-metrics-disk-memory-linux.sh` script, with respective cronjobs and package installations.
+This script contains automated process to install `custom-metrics-disk-memory-linux.sh` script, with respective cronjobs and package installations.
 * `custom-metrics-auto-install-url.sh`
-  This script contains the wget command to download the `auto-install-custom-metrics-linux.sh` script.
+This script contains the wget command to download the `auto-install-custom-metrics-linux.sh` script.
 * `custom-metrics-disk-memory-linux.sh`
-  This script contains the `PutMetricData` function to send metrics to CloudWatch DashBoard.
+This script contains the `PutMetricData` function to send metrics to CloudWatch DashBoard.
 
 ## NOTES:
 
