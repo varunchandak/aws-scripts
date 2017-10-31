@@ -325,11 +325,11 @@ testexample.com,MX,10 testexample2.com
 ### Screenshots
 #### Terminal Output
 
-![](http://cloudbeings.in/images/r53-terminal-output.png)
+![](http://vrnchndk.in/images/r53-terminal-output.png)
 
 #### AWS Console Output
 
-![](http://cloudbeings.in/images/r53-gui-output.png)
+![](http://vrnchndk.in/images/r53-gui-output.png)
 
 
 Code is available on [Github](github.com)
