@@ -15,7 +15,7 @@ Set-ExecutionPolicy Unrestricted
 
 3. Configure Cloudwatch credentials on the server:
 ```sh
-aws configure --profile cloudwatch
+aws configure
 ```
 4. Enter the required fields carefully.
 5. Create scripts directory specific to cloudcover:
