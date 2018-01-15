@@ -10,7 +10,16 @@ export AWS_DEFAULT_OUTPUT="text"
 INST_ID="$(curl http://169.254.169.254/latest/meta-data/instance-id)"
 
 MemoryMetric() {
-mem=$(bc <<< "scale=2; $(free -m  | grep ^Mem | awk '{print $3/$2*100}')/1")
+vmstat -s | sed -e 's/^[ \t]*//' | cut -d' ' -f1,3- | tr -s ' ' ',' | grep -e 'total,memory' -e 'free,memory' -e 'buffer,memory' -e 'swap,cache' | awk -F, '{print $1/1024","$2" "$3}' > /tmp/mem-usage.csv
+MemTotal="$(cat /tmp/mem-usage.csv | grep -e 'total memory' | awk -F, '{print $1}')"
+MemFree="$(cat /tmp/mem-usage.csv | grep -e 'free memory' | awk -F, '{print $1}')"
+Buffers="$(cat /tmp/mem-usage.csv | grep -e 'buffer memory' | awk -F, '{print $1}')"
+Cached="$(cat /tmp/mem-usage.csv | grep -e 'swap cache' | awk -F, '{print $1}')"
+TotalMemFree="$(bc -l <<< $MemFree+$Buffers+$Cached)"
+TotalMemUsed="$(bc -l <<< $MemTotal-$TotalMemFree)"
+mem="$(bc <<< "scale=2; $TotalMemUsed*100/$MemTotal")"
+rm -f /tmp/mem-usage.csv
+#mem=$(bc <<< "scale=2; $(free -m  | grep ^Mem | awk '{print $3/$2*100}')/1")
 aws cloudwatch put-metric-data \
 	--metric-name "MemoryUtilization" \
 	--unit Percent \
