@@ -12,13 +12,17 @@ YUM_CMD=$(which yum)
 APT_GET_CMD=$(which apt-get)
 
 if [[ ! -z $YUM_CMD ]]; then
-	yum install -y bc blkid dos2unix
+	yum install -y bc
+	yum install -y blkid
+	yum install -y dos2unix
 	wget https://bootstrap.pypa.io/get-pip.py; python get-pip.py
 	pip install --upgrade pip
 	pip install --upgrade awscli
 elif [[ ! -z $APT_GET_CMD ]]; then
 	apt-get update &> /dev/null
-	apt-get install -y bc blkid dos2unix
+	apt-get install -y bc
+	apt-get install -y blkid
+	apt-get install -y dos2unix
 	wget https://bootstrap.pypa.io/get-pip.py; python get-pip.py
 	pip install --upgrade pip
 	pip install --upgrade awscli
@@ -36,11 +40,15 @@ mkdir /root/scripts/
 #mkdir /root/.aws/
 cd /root/scripts/
 rm -f CustomMetricsMemoryDisk_v2.sh custom-metrics-disk-memory-linux.sh
-wget https://s3.ap-south-1.amazonaws.com/cldcvr-custom-metrics/Linux/Disk_RAM/custom-metrics-disk-memory-linux.sh
+wget https://s3.ap-south-1.amazonaws.com/cldcvr-custom-metrics/Linux/Disk_RAM/custom-metrics-disk-memory-linux.sh -O /root/scripts/custom-metrics-disk-memory-linux.sh
 dos2unix /root/scripts/custom-metrics-disk-memory-linux.sh
 chmod +x /root/scripts/custom-metrics-disk-memory-linux.sh
 
-# Setting up cron jobs
+# Remove existing (defunct) crontabs
+crontab -l | grep -v 'DiskMetric' | crontab -
+crontab -l | grep -v 'MemoryMetric' | crontab -
+
+# Setting up updated cron jobs
 crontab -l | { cat; echo -e "* * * * *\t/bin/bash /root/scripts/custom-metrics-disk-memory-linux.sh DiskMetric"; } | crontab -
 crontab -l | { cat; echo -e "* * * * *\t/bin/bash /root/scripts/custom-metrics-disk-memory-linux.sh MemoryMetric"; } | crontab -
 

@@ -5,8 +5,8 @@
 export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:"$PATH"
 
 clear
-read -r -e -p "Enter AWS_PROFILE name: " -i "default" AWS_PROFILE
-read -r -e -p "Enter AWS_REGION name: " -i "ap-southeast-1" AWS_REGION
+read -r -e -p "Enter AWS_PROFILE name: " -i "" AWS_PROFILE
+read -r -e -p "Enter AWS_REGION name: " -i "" AWS_REGION
 read -r -e -p "Enter CLIENT_NAME name: " -i "" CLIENT_NAME
 echo "Setting alias"
 alias aws='aws --profile ''"$AWS_PROFILE"'' --region '"$AWS_REGION"' --output text'
@@ -16,10 +16,11 @@ shopt -s expand_aliases
 #ACCOUNT ID
 ACCOUNT_ID="$(aws sts get-caller-identity --query 'Account' --output text)"
 # Set SNS ARN for alerts. Multiple ARN are CSV delimited under single double quotes
-read -r -e -p "Enter SNS ARN (Comma separated; no spaces): " -i "arn:aws:sns:ap-southeast-1:$ACCOUNT_ID:slack-alerts" SNS_ARN
+awless list topics
+read -r -e -p "Enter SNS ARN (Comma separated; no spaces): " -i "" SNS_ARN
 
 # Set instance ID
-read -r -e -p "Enter Instance ID: " -i "i-abcd1234" INST_ID
+read -r -e -p "Enter Instance ID: " -i "" INST_ID
 echo "Checking custom metrics associated with $INST_ID"
 if [ -z "$(aws ec2 describe-instances --instance-id $INST_ID --output text --query 'Reservations[*].Instances[*].Platform')" ]; then
 	echo "Instance Platform is Linux"
@@ -35,8 +36,8 @@ setMemoryAlarms() {
 	aws cloudwatch list-metrics --output text --query 'Metrics[?Namespace==`'"$2"'`].Dimensions[].Value' | tr -s '\t' '\n' | grep -e "$INST_ID" | while read -r INST_ID; do
 		IFS=,
 		awless list instances --columns id,name --no-headers --format csv | grep "$INST_ID" | while read -r INST_ID INST_NAME; do
-			for PERCENTAGE in 75 90; do
-				ALARM_DESCRIPTION="$CLIENT_NAME $INST_NAME ($INST_ID) $3 > $PERCENTAGE%"
+			for PERCENTAGE in 90; do
+				ALARM_DESCRIPTION="$CLIENT_NAME $INST_NAME $INST_ID $3 > $PERCENTAGE%"
 				awless create alarm -f alarm-actions="$1" namespace="$2" metric="$3" \
 				dimensions=InstanceId:"$INST_ID" \
 				evaluation-periods=1 \
@@ -58,8 +59,8 @@ setDiskAlarmsWindows() {
 		DRIVE_ARR=($(echo $DISK_DIMENSIONS | cut -d, -f2 | cut -d: -f2))
 		INST_NAME="$(awless list instances --columns id,name --no-headers --format csv | grep "$INST_ID" | awk -F, '{print $NF}')"
 		for DRIVE_ID in "${DRIVE_ARR[*]}"; do
-			for PERCENTAGE in 75 90; do
-				ALARM_DESCRIPTION="$CLIENT_NAME $INST_NAME ($INST_ID) $DRIVE_ID: $3 > $PERCENTAGE%"
+			for PERCENTAGE in 90; do
+				ALARM_DESCRIPTION="$CLIENT_NAME $INST_NAME $INST_ID $DRIVE_ID: $3 > $PERCENTAGE%"
 				awless create alarm -f alarm-actions="$1" namespace="$2" metric="$3" \
 					dimensions="$DISK_DIMENSIONS" \
 					evaluation-periods=1 \
@@ -77,11 +78,11 @@ setDiskAlarmsWindows() {
 
 setDiskAlarmsLinux() {
 	# Main logic #setDiskAlarms "$SNS_ARN" "$NAMESPACE_ID" "$METRIC_NAME""Utilization"
-	aws cloudwatch list-metrics --output text --query 'Metrics[?Namespace==`Linux/Disk`].Dimensions' | tr -s '\t' ':' | paste -d, - - - | grep "$INST_ID" | while read -r DISK_DIMENSIONS; do
+	aws cloudwatch list-metrics --output text --query 'Metrics[?Namespace==`'"$2"'`].Dimensions' | tr -s '\t' ':' | paste -d, - - - | grep "$INST_ID" | while read -r DISK_DIMENSIONS; do
 		DRIVE_ID="$(echo $DISK_DIMENSIONS | awk -F: '{print $NF}')"
 		INST_NAME="$(awless list instances --columns id,name --no-headers --format csv | grep "$INST_ID" | awk -F, '{print $NF}')"
-		for PERCENTAGE in 75 90; do
-			ALARM_DESCRIPTION="$CLIENT_NAME $INST_NAME ($INST_ID) $DRIVE_ID $3 > $PERCENTAGE%"
+		for PERCENTAGE in 90; do
+			ALARM_DESCRIPTION="$CLIENT_NAME $INST_NAME $INST_ID $DRIVE_ID $3 > $PERCENTAGE%"
 			awless create alarm -f alarm-actions="$1" namespace="$2" metric="$3" \
 			dimensions="$DISK_DIMENSIONS" \
 			evaluation-periods=1 \

@@ -12,8 +12,8 @@ This script makes use of `awless` tool along with `aws` CLI.
 ## Synopsis:
 
 This script will take the input of Instance ID and will check/do the following:
-1. Check if the instance is Linux/Windows
-2. Check for custom metrics for this particular instance
+1. Check if the instance is `Linux`/`Windows`
+2. Check for custom metrics for this particular instance (I am using namespaces as `Linux/Disk`, `Linux/Memory`, `Windows/Disk` and `Windows/Memory`)
 3. If the custom metrics (either one) found, run the functions accordingly for `Memory` and `Disk` alarms/alerts.
 4. If the custom metrics (any one) are not present for this instance, then the script quits, yelling to install the custom metrics **ASAP**.
 

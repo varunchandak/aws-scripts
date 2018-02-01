@@ -8,7 +8,7 @@ Requirements:
 -	awless installed and configured - IMPORTANT
 -	AWS CLI profile with appropriate permissions
 
-Example: ./SCRIPT.sh <CLIENT_AWS_PROFILE> <AWS_REGION>
+Example: ./SCRIPT.sh <CLIENT_AWS_PROFILE> <AWS_REGION> 
 
 #######################################
 DISCLAIMER: Test First, Execute Second.
