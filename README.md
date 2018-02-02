@@ -12,6 +12,7 @@
 * aws-audit
 * iam-mfa-alert
 * remove-iam-user-completely
+* unhealthy-hosts-to-slack-alerts
 ---
 
 #### More to come..
