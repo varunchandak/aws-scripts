@@ -1,13 +1,10 @@
 #!/bin/bash
 
-
-
 usage() {
 	echo 'Set AWS access key, secret key and session token from STS (default 1 hour duration)
 Usage:
 ./script.sh <AWS_PROFILE_NAME> <AWS_REGION>
 '
-
 }
 
 if [ "$#" -ne 2 ]; then
@@ -15,7 +12,7 @@ if [ "$#" -ne 2 ]; then
 else
 	export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
 	ACCOUNT_ID="$(aws --profile "$1" sts get-caller-identity --query 'Account' --output text)"
-	CREDS_JSON="$(aws --profile "$1" sts assume-role --role-arn "arn:aws:iam::$ACCOUNT_ID:role/<ROLENAME>" --role-session-name "sts-creds-$(date +%s)" --output json)"
+	CREDS_JSON="$(aws --profile "$1" sts assume-role --role-arn "arn:aws:iam::$ACCOUNT_ID:role/<ROLE_NAME>" --role-session-name "sts-creds-$(date +%s)" --output json)"
 
 	echo
 	echo "### PROFILE $1 ###"
