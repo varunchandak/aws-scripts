@@ -5,9 +5,9 @@ def lambda_handler(event, context):
 
     client = boto3.client('ec2')
     regions = [region['RegionName'] for region in client.describe_regions()['Regions']]
-    #ec2 = boto3.client("ec2", region_name="ap-south-1")
-    for region in regions:
-        ec2 = boto3.client("ec2", region_name=region)
+    for regionnaire in regions:
+        print regionnaire
+        ec2 = boto3.client("ec2", region_name=regionnaire)
         instances_list =  ec2.describe_instances()
         nowtime = datetime.datetime.now().strftime('%d%m%Y-%H-%M')
         for reservation in instances_list['Reservations']:
@@ -37,7 +37,7 @@ def lambda_handler(event, context):
                         currTime = datetime.datetime.strptime(currTimeStr,"%H:%M")
                         delta = currTime - timeToCreate
                         deltaMinutes = abs(delta.total_seconds())
-                        if(deltaMinutes <= 300):
+                        if(deltaMinutes < 900):
                             createImageResponse = ec2.create_image(
                                         InstanceId = instance['InstanceId'],
                                         NoReboot=(not reboot),
@@ -46,9 +46,12 @@ def lambda_handler(event, context):
                                         Name= instanceName + "-" + str(nowtime)
                                         )
                             imageId = createImageResponse["ImageId"]
-                            print region + " , " + imageId
+                            print imageId
+                            final_tags = []
                             for tag in tags:
-                                if(tag['Key']=="Name"):
-                                    tags.remove(tag)
-                            ec2.create_tags(Resources=[imageId],Tags=tags)
-    return 'Hello from Lambda'
+                                if not (tag['Key']=="Name"):
+                                    final_tags.append(tag)
+                                if not (tag['Key'].startswith("aws:") or tag['Value'].startswith("aws:")):
+                                    final_tags.append(tag)
+                            ec2.create_tags(Resources=[imageId],Tags=final_tags)
+    return 'createAMI run successfully'
