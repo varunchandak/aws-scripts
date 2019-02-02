@@ -13,6 +13,10 @@
 #		any new instances are launched using the new configuration parameters, 
 #		but existing instances are not affected.
 
+usage() {
+	echo "See the README HERE: https://github.com/varunchandak/aws-scripts/tree/master/automate-launch-configuration-update-with-latest-image"
+}
+
 if [ "$#" -ne 3 ]; then
 	usage
 else

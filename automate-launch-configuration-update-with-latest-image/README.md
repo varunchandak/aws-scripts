@@ -1,5 +1,11 @@
 # Automatically update ASG with latest image and launch configuration
 
+## Usage:
+```
+./automate-launch-configuration-update-with-latest-image.sh <AWS_PROFILE> <AWS_REGION> <ASG_NAME>
+```
+
+
 This script will do the following (in order):
 1. Get a list of instances running inside the autoscaling group
 2. Create an AMI of the particular instance and store AMI ID
