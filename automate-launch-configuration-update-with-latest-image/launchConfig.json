@@ -1,0 +1,40 @@
+{
+    "LaunchConfigurationName": "", 
+    "ImageId": "", 
+    "KeyName": "", 
+    "SecurityGroups": [
+        ""
+    ], 
+    "ClassicLinkVPCId": "", 
+    "ClassicLinkVPCSecurityGroups": [
+        ""
+    ], 
+    "UserData": "", 
+    "InstanceId": "", 
+    "InstanceType": "", 
+    "KernelId": "", 
+    "RamdiskId": "", 
+    "BlockDeviceMappings": [
+        {
+            "VirtualName": "", 
+            "DeviceName": "", 
+            "Ebs": {
+                "SnapshotId": "", 
+                "VolumeSize": 0, 
+                "VolumeType": "", 
+                "DeleteOnTermination": true, 
+                "Iops": 0, 
+                "Encrypted": true
+            }, 
+            "NoDevice": true
+        }
+    ], 
+    "InstanceMonitoring": {
+        "Enabled": true
+    }, 
+    "SpotPrice": "", 
+    "IamInstanceProfile": "", 
+    "EbsOptimized": true, 
+    "AssociatePublicIpAddress": true, 
+    "PlacementTenancy": ""
+}
