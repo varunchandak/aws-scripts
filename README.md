@@ -6,6 +6,7 @@
 * automate-custom-metrics-alarms-installation
 * automate-custom-metrics-installation
 * automate-ec2-migration-between-regions
+* automate-launch-configuration-update-with-latest-image
 * automate-openvpn-user-creation
 * automate-route53-entries
 * automate-slack-alerts-for-cloudwatch-90-percent
