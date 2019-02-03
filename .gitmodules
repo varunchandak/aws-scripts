@@ -1,0 +1,3 @@
+[submodule "automate-launch-configuration-update-with-latest-image"]
+	path = automate-launch-configuration-update-with-latest-image
+	url = git@github.com:varunchandak/automate-launch-configuration-update-with-latest-image.git
