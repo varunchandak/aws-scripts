@@ -1,3 +1,6 @@
 [submodule "automate-launch-configuration-update-with-latest-image"]
 	path = automate-launch-configuration-update-with-latest-image
 	url = git@github.com:varunchandak/automate-launch-configuration-update-with-latest-image.git
+[submodule "add-slack-alerts"]
+	path = add-slack-alerts
+	url = git@github.com:varunchandak/add-slack-alerts.git
