@@ -18,38 +18,38 @@ Set-ExecutionPolicy Unrestricted
 aws configure
 ```
 4. Enter the required fields carefully.
-5. Create script directory specific to cloudcover:
+5. Create script directory:
 ```powershell
-new-item c:\cloudcover\scripts\ -itemtype directory
+new-item c:\scripts\ -itemtype directory
 ```
 ---
 ## Disk Metrics
-1. Download the script `custom-metrics-disk-windows.ps1` from Github to `c:\cloudcover\scripts\` folder, or use the following command:
+1. Download the script `custom-metrics-disk-windows.ps1` from Github to `c:\scripts\` folder, or use the following command:
 ```powershell
-(New-Object System.Net.WebClient).DownloadFile(“https://s3.ap-south-1.amazonaws.com/cldcvr-custom-metrics/windows/disk/custom-metrics-disk-windows.ps1”,”c:\cloudcover\scripts\custom-metrics-disk-windows.ps1")
+(New-Object System.Net.WebClient).DownloadFile(“https://s3.ap-south-1.amazonaws.com/cldcvr-custom-metrics/windows/disk/custom-metrics-disk-windows.ps1”,”c:\scripts\custom-metrics-disk-windows.ps1")
 ```
 2. Test the script by running it a few times.
 ```powershell
-&  c:\cloudcover\scripts\custom-metrics-disk-windows.ps1
+&  c:\scripts\custom-metrics-disk-windows.ps1
 ```
 
 3. Create a scheduler for script to run on 10 minutes interval:
 ```powershell
-schtasks /create /sc minute /mo 10 /tn DiskUsageReport /tr "powershell.exe -WindowStyle Hidden -NoLogo -File c:\cloudcover\scripts\custom-metrics-disk-windows.ps1"
+schtasks /create /sc minute /mo 10 /tn DiskUsageReport /tr "powershell.exe -WindowStyle Hidden -NoLogo -File c:\scripts\custom-metrics-disk-windows.ps1"
 ```
 ---
 ### Memory Metrics
-1. Download the script `custom-metrics-memory-windows.ps1` from Github to `c:\cloudcover\scripts\` folder, or use the following command:
+1. Download the script `custom-metrics-memory-windows.ps1` from Github to `c:\scripts\` folder, or use the following command:
 ```powershell
-(New-Object System.Net.WebClient).DownloadFile(“https://s3.ap-south-1.amazonaws.com/cldcvr-custom-metrics/windows/memory/custom-metrics-memory-windows.ps1”,”c:\cloudcover\scripts\custom-metrics-memory-windows.ps1")
+(New-Object System.Net.WebClient).DownloadFile(“https://s3.ap-south-1.amazonaws.com/cldcvr-custom-metrics/windows/memory/custom-metrics-memory-windows.ps1”,”c:\scripts\custom-metrics-memory-windows.ps1")
 ```
 2. Test the script by running it in powershell (2-3 times):
 ```powershell
-&  c:\cloudcover\scripts\custom-metrics-memory-windows.ps1
+&  c:\scripts\custom-metrics-memory-windows.ps1
 ```
 3. Create a scheduler for script to run for 1 minute:
 ```powershell
-schtasks /create /sc minute /mo 1 /tn MemoryUsageReport /tr "powershell.exe -WindowStyle Hidden -NoLogo -File c:\cloudcover\scripts\custom-metrics-memory-windows.ps1"
+schtasks /create /sc minute /mo 1 /tn MemoryUsageReport /tr "powershell.exe -WindowStyle Hidden -NoLogo -File c:\scripts\custom-metrics-memory-windows.ps1"
 ```
 ---
 **NOTES:**

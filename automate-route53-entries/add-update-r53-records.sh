@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-alias aws=''"$(which aws)"' --profile cloudcover --output text'
+alias aws=''"$(which aws)"' --profile '"$AWS_PROFILE"' --output text'
 shopt -s expand_aliases
 
 addArecord () {
