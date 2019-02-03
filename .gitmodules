@@ -4,3 +4,33 @@
 [submodule "add-slack-alerts"]
 	path = add-slack-alerts
 	url = git@github.com:varunchandak/add-slack-alerts.git
+[submodule "automate-custom-metrics-alarms-installation"]
+	path = automate-custom-metrics-alarms-installation
+	url = git@github.com:/varunchandak/automate-custom-metrics-alarms-installation.git
+[submodule "automate-custom-metrics-installation"]
+	path = automate-custom-metrics-installation
+	url = git@github.com:/varunchandak/automate-custom-metrics-installation.git
+[submodule "automate-ec2-migration-between-regions"]
+	path = automate-ec2-migration-between-regions
+	url = git@github.com:/varunchandak/automate-ec2-migration-between-regions.git
+[submodule "automate-lambda-for-ami-creation-deletion"]
+	path = automate-lambda-for-ami-creation-deletion
+	url = git@github.com:/varunchandak/automate-lambda-for-ami-creation-deletion.git
+[submodule "automate-route53-entries"]
+	path = automate-route53-entries
+	url = git@github.com:/varunchandak/automate-route53-entries.git
+[submodule "automate-slack-alerts-for-cloudwatch-90-percent"]
+	path = automate-slack-alerts-for-cloudwatch-90-percent
+	url = git@github.com:/varunchandak/automate-slack-alerts-for-cloudwatch-90-percent.git
+[submodule "iam-access-key-alert"]
+	path = iam-access-key-alert
+	url = git@github.com:/varunchandak/iam-access-key-alert.git
+[submodule "iam-mfa-alert"]
+	path = iam-mfa-alert
+	url = git@github.com:/varunchandak/iam-mfa-alert.git
+[submodule "iam-password-alert"]
+	path = iam-password-alert
+	url = git@github.com:/varunchandak/iam-password-alert.git
+[submodule "unhealthy-hosts-to-slack-alerts"]
+	path = unhealthy-hosts-to-slack-alerts
+	url = git@github.com:/varunchandak/unhealthy-hosts-to-slack-alerts.git
