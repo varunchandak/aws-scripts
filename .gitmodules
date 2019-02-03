@@ -34,3 +34,6 @@
 [submodule "unhealthy-hosts-to-slack-alerts"]
 	path = unhealthy-hosts-to-slack-alerts
 	url = git@github.com:/varunchandak/unhealthy-hosts-to-slack-alerts.git
+[submodule "aws-audit-script"]
+	path = aws-audit-script
+	url = git@github.com:/varunchandak/aws-audit-script.git
